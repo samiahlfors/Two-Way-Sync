@@ -63,5 +63,7 @@ $RECYCLE.BIN/
 .DS_Store
 
 _NCrunch*
-
 .idea/*
+packages/
+bin/
+obj/
