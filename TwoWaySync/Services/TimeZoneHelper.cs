@@ -5,11 +5,20 @@ namespace TwoWaySync.Services
     // https://learn.microsoft.com/en-us/dotnet/standard/datetime/converting-between-time-zones
     public static class TimeZoneHelper
     {
-        private static TimeZoneInfo SweTimeZone = TimeZoneInfo.FindSystemTimeZoneById("W. Europe Standard Time");
-
-        public static DateTime ConvertToUtc(DateTime dateTime)
+        private static readonly TimeZoneInfo SweTimeZone = GetSwedishTimeZone();
+        
+        private static TimeZoneInfo GetSwedishTimeZone()
         {
-            return TimeZoneInfo.ConvertTimeToUtc(dateTime, SweTimeZone);
+            try
+            {
+                return TimeZoneInfo.FindSystemTimeZoneById("W. Europe Standard Time");
+            }
+            catch (TimeZoneNotFoundException)
+            {
+                return TimeZoneInfo.FindSystemTimeZoneById("Europe/Stockholm");
+            }
         }
+
+        public static DateTime ConvertToUtc(DateTime dateTime) => TimeZoneInfo.ConvertTimeToUtc(DateTime.SpecifyKind(dateTime, DateTimeKind.Unspecified), SweTimeZone);
     }
 }
