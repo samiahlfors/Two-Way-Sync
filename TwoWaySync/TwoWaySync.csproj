@@ -90,6 +90,7 @@
         <Reference Include="System.Xml"/>
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="Database\Schema.sql" />
         <Compile Include="Models\Internal\Company.cs" />
         <Compile Include="Models\Internal\Task.cs" />
         <Compile Include="Models\Remote\RemoteCompanyDto.cs" />
