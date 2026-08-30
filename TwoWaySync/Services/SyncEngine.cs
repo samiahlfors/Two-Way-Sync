@@ -8,11 +8,13 @@ namespace TwoWaySync.Services
         private const int TasksPerRun = 100;
         private IMappingRepository _repository;
         private IRemoteApiClient _apiClient;
+        private ILocalApi _localApi;
 
-        public SyncEngine(IMappingRepository repository, IRemoteApiClient apiClient)
+        public SyncEngine(IMappingRepository repository, IRemoteApiClient apiClient, ILocalApi localApi)
         {
             _repository = repository;
             _apiClient = apiClient;
+            _localApi = localApi;
         }
         
         // Tasks

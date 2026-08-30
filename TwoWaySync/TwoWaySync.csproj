@@ -113,7 +113,7 @@
     </ItemGroup>
     <ItemGroup>
         <None Include="Database\Schema.sql" />
-        <Compile Include="Interfaces\IInternalApi.cs" />
+        <Compile Include="Interfaces\ILocalApi.cs" />
         <Compile Include="Interfaces\IMappingRepository.cs" />
         <Compile Include="Interfaces\IRemoteApiClient.cs" />
         <Compile Include="Models\EntityMapping.cs" />

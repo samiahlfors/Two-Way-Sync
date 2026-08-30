@@ -4,7 +4,7 @@ using TwoWaySync.Models.Internal;
 
 namespace TwoWaySync.Interfaces
 {
-    public interface IInternalApi
+    public interface ILocalApi
     {
         Company GetCompanyByName(string companyName);
         Company GetCompanyById(Guid companyId);
