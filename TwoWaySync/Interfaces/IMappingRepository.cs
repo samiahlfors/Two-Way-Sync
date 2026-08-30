@@ -7,6 +7,7 @@ namespace TwoWaySync.Interfaces
     public interface IMappingRepository
     {
         // Usage: GetEntityByLocalId("Task", new Guid("8f825fd0-c3a2-4000-9941-89a0ba056ee4"))
+        // Usage: GetEntityByRemoteId("Company", 45)
         // This should return an EntityMapping object
         EntityMapping GetEntityByLocalId (string entityType, Guid localId);
         EntityMapping GetEntityByRemoteId(string entityType, int remoteId);
