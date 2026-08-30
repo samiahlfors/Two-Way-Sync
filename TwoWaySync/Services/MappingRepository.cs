@@ -1,11 +1,12 @@
 using System;
 using Dapper;
 using Npgsql;
+using TwoWaySync.Interfaces;
 using TwoWaySync.Models;
 
 namespace TwoWaySync.Services
 {
-    public class MappingRepository
+    public class MappingRepository : IMappingRepository
     {
         private string _connectionString;
 
