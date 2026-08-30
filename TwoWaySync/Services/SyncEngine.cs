@@ -52,8 +52,7 @@ namespace TwoWaySync.Services
             // Only save if any changes were made
             if (tasks.Count > 0)
             {
-                var lastTask = tasks.Last();
-                _repository.SaveSyncStamp("last_sync_remote_task", lastTask.LastModifiedDate);   
+                _repository.SaveSyncStamp("last_sync_remote_task", tasks.Max(task => task.LastModifiedDate));   
             }
         }
 
@@ -88,14 +87,27 @@ namespace TwoWaySync.Services
             // Only save if any changes were made
             if (tasks.Count > 0)
             {
-                var lastTask = tasks.Last();
-                _repository.SaveSyncStamp("last_sync_local_task", lastTask.ChangedDate);   
+                _repository.SaveSyncStamp("last_sync_local_task", tasks.Max(task => task.ChangedDate));   
             }
         }
         
         // Companies
-        private void SyncCompaniesRemote() {}
-        private void SyncCompaniesLocal() {}
+        private void SyncCompaniesLocalToRemote()
+        {
+            // TODO: Make sure this gets executed first, since "Membrain is the master for any given property"
+            // Get last sync
+            // Get and loop through local companies
+            // If remote name does not match with local name, update company remotely
+            // TODO: Save sync stamp here, I think..?
+        }
+
+        private void SyncCompaniesRemoteToLocal()
+        {
+            // Get last sync
+            // Get and loop through remote companies
+            // If local name does not match with remote name, update local company
+            // TODO: Save sync stamp here, I think..?
+        }
         
         // Get or create new company
         private int GetOrCreateRemoteCompany(Company company)
@@ -111,12 +123,14 @@ namespace TwoWaySync.Services
         }
         
         // Called every N minutes
+        // TODO: Check if this should be renamed to Execute or similar
         private void Run()
         {
+            // Run local company name syncing first
+            SyncCompaniesLocalToRemote();
+            SyncCompaniesRemoteToLocal();
             SyncTasksRemoteToLocal();
             SyncTasksLocalToRemote();
-            SyncCompaniesRemote();
-            SyncCompaniesLocal();
         }
     }
 }
