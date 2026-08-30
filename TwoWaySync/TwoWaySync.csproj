@@ -124,6 +124,7 @@
         <Compile Include="Properties\AssemblyInfo.cs"/>
         <Compile Include="Services\MappingRepository.cs" />
         <Compile Include="Services\RemoteApiClient.cs" />
+        <Compile Include="Services\SyncEngine.cs" />
         <Compile Include="Services\TimeZoneHelper.cs" />
     </ItemGroup>
     <ItemGroup>
