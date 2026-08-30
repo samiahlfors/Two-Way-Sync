@@ -50,14 +50,13 @@ namespace TwoWaySync.Services
             var lastSyncSwe = TimeZoneHelper.ConvertToUtc(lastSync);
             
             // Get tasks after said sync date
-            var tasks = _apiClient.GetTasks(lastSyncSwe, 0, TasksPerRun);
+            var tasks = _localApi.GetTasks(lastSyncSwe, DateTime.Now);
             
             // Loop through all tasks
             foreach (var task in tasks)
             {
                 // Check if company already exists, else, create a new one
-                var remoteCompany = _apiClient.GetCompany(task.RelatedCompanyId);
-                // var localCompany = 
+                var localCompany = _localApi.GetCompanyById(task.CompanyId);
             }
             
             // Save current time as "last_sync"
