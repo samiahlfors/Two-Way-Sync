@@ -13,5 +13,22 @@ namespace TwoWaySync.Services
             _repository = repository;
             _apiClient = apiClient;
         }
+        
+        // Tasks
+        private void SyncTasksRemote() {}
+        private void SyncTasksLocal() {}
+        
+        // Companies
+        private void SyncCompaniesRemote() {}
+        private void SyncCompaniesLocal() {}
+        
+        // Called every N minutes
+        private void Run()
+        {
+            SyncTasksRemote();
+            SyncTasksLocal();
+            SyncCompaniesRemote();
+            SyncCompaniesLocal();
+        }
     }
 }
