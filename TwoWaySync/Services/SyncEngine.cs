@@ -18,25 +18,51 @@ namespace TwoWaySync.Services
         // Tasks
         private void SyncTasksRemoteToLocal()
         {
-            // Get the last sync time
+            // Get the last sync time, and convert it to UTC
             // This should keep track of what's being synced at the time as well.
-            var lastSync = _repository.GetSyncStamp("last_sync");
+            var lastSync = _repository.GetSyncStamp("last_sync_remote_task");
+            var lastSyncUtc = TimeZoneHelper.ConvertToUtc(lastSync);
             
             // Get tasks after said sync date
-            var tasks = _apiClient.GetTasks(lastSync, 0, TasksPerRun);
+            var tasks = _apiClient.GetTasks(lastSyncUtc, 0, TasksPerRun);
             
             // Loop through all tasks
             foreach (var task in tasks)
             {
                 // Check if company already exists, else, create a new one
+                var remoteCompany = _apiClient.GetCompany(task.RelatedCompanyId);
+                // var localCompany = 
             }
             
             // Save current time as "last_sync"
             // This should save the last processed task date
             // Only save if any changes were made
-            _repository.SaveSyncStamp("last_sync", DateTime.Now);
+            _repository.SaveSyncStamp("last_sync_remote_task", DateTime.Now);
         }
-        private void SyncTasksLocalToRemote() {}
+
+        private void SyncTasksLocalToRemote()
+        {
+            // Get the last sync time, and convert it to UTC
+            // This should keep track of what's being synced at the time as well.
+            var lastSync = _repository.GetSyncStamp("last_sync_local_task");
+            var lastSyncSwe = TimeZoneHelper.ConvertToUtc(lastSync);
+            
+            // Get tasks after said sync date
+            var tasks = _apiClient.GetTasks(lastSyncSwe, 0, TasksPerRun);
+            
+            // Loop through all tasks
+            foreach (var task in tasks)
+            {
+                // Check if company already exists, else, create a new one
+                var remoteCompany = _apiClient.GetCompany(task.RelatedCompanyId);
+                // var localCompany = 
+            }
+            
+            // Save current time as "last_sync"
+            // This should save the last processed task date
+            // Only save if any changes were made
+            _repository.SaveSyncStamp("last_sync_local_task", DateTime.Now);
+        }
         
         // Companies
         private void SyncCompaniesRemote() {}
