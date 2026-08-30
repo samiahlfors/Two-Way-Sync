@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using TwoWaySync.Interfaces;
@@ -15,7 +16,12 @@ namespace TwoWaySync.Services
             _httpClient = httpClient;
         }
         
-        public RemoteTaskDto GetTasks(int id)
+        public List<RemoteTaskDto> GetTasks(DateTime lastModifiedFrom, int offset, int pageSize)
+        {
+            throw new NotImplementedException();
+        }
+
+        public RemoteTaskDto GetTask(int id)
         {
             throw new System.NotImplementedException();
         }
@@ -30,12 +36,12 @@ namespace TwoWaySync.Services
             throw new System.NotImplementedException();
         }
 
-        public List<RemoteCompanyDto> GetCompanies(int lastModifiedFrom, int offset, int pageSize, string name)
+        public List<RemoteCompanyDto> GetCompanies(DateTime lastModifiedFrom, int offset, int pageSize, string name)
         {
             throw new System.NotImplementedException();
         }
 
-        public RemoteCompanyDto GetCompanies(int id)
+        public RemoteCompanyDto GetCompany(int id)
         {
             throw new System.NotImplementedException();
         }
@@ -46,11 +52,6 @@ namespace TwoWaySync.Services
         }
 
         public RemoteCompanyDto CreateCompany(RemoteCompanyDto company)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        List<RemoteTaskDto> IRemoteApiClient.GetTasks(int lastModifiedFrom, int offset, int pageSize)
         {
             throw new System.NotImplementedException();
         }
