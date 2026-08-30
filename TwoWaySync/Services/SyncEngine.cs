@@ -124,7 +124,7 @@ namespace TwoWaySync.Services
         
         // Called every N minutes
         // TODO: Check if this should be renamed to Execute or similar
-        private void Run()
+        public void Run()
         {
             // Run local company name syncing first
             SyncCompaniesLocalToRemote();
