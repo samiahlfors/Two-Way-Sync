@@ -1,5 +1,8 @@
 using System;
+using System.Linq;
 using TwoWaySync.Interfaces;
+using TwoWaySync.Models.Internal;
+using TwoWaySync.Models.Remote;
 
 namespace TwoWaySync.Services
 {
@@ -25,21 +28,33 @@ namespace TwoWaySync.Services
             var lastSync = _repository.GetSyncStamp("last_sync_remote_task");
             var lastSyncUtc = TimeZoneHelper.ConvertToUtc(lastSync);
             
-            // Get tasks after said sync date
+            // Get remote tasks updated after said sync date
             var tasks = _apiClient.GetTasks(lastSyncUtc, 0, TasksPerRun);
             
             // Loop through all tasks
             foreach (var task in tasks)
             {
-                // Check if company already exists, else, create a new one
+                // Get the remote company
                 var remoteCompany = _apiClient.GetCompany(task.RelatedCompanyId);
-                // var localCompany = 
+                
+                // Get (or create) the corresponding local company
+                var localCompany = GetOrCreateLocalCompany(remoteCompany);
+                
+                // Get local task (ID)
+                var localTaskId = _repository.GetEntityByRemoteId("Task", task.Id).LocalId;
+                
+                // If task found, update task
+                // Else, create a new one
             }
             
-            // Save current time as "last_sync"
+            // Save current time as "last_sync_remote_task"
             // This should save the last processed task date
             // Only save if any changes were made
-            _repository.SaveSyncStamp("last_sync_remote_task", DateTime.Now);
+            if (tasks.Count > 0)
+            {
+                var lastTask = tasks.Last();
+                _repository.SaveSyncStamp("last_sync_remote_task", lastTask.LastModifiedDate);   
+            }
         }
 
         private void SyncTasksLocalToRemote()
@@ -49,25 +64,51 @@ namespace TwoWaySync.Services
             var lastSync = _repository.GetSyncStamp("last_sync_local_task");
             var lastSyncSwe = TimeZoneHelper.ConvertToUtc(lastSync);
             
-            // Get tasks after said sync date
+            // Get local tasks updated after said sync date
             var tasks = _localApi.GetTasks(lastSyncSwe, DateTime.Now);
             
             // Loop through all tasks
             foreach (var task in tasks)
             {
-                // Check if company already exists, else, create a new one
+                // Get the local company
                 var localCompany = _localApi.GetCompanyById(task.CompanyId);
+                
+                // Get (or create) the corresponding remote company
+                var remoteCompany = GetOrCreateRemoteCompany(localCompany);
+                
+                // Get remote task (ID)
+                var remoteTaskId = _repository.GetEntityByLocalId("Task", task.Id);
+                
+                // If task found, update task
+                // Else, create a new one
             }
             
-            // Save current time as "last_sync"
+            // Save current time as "last_sync_local_task"
             // This should save the last processed task date
             // Only save if any changes were made
-            _repository.SaveSyncStamp("last_sync_local_task", DateTime.Now);
+            if (tasks.Count > 0)
+            {
+                var lastTask = tasks.Last();
+                _repository.SaveSyncStamp("last_sync_local_task", lastTask.ChangedDate);   
+            }
         }
         
         // Companies
         private void SyncCompaniesRemote() {}
         private void SyncCompaniesLocal() {}
+        
+        // Get or create new company
+        private int GetOrCreateRemoteCompany(Company company)
+        {
+            // Either return a company ID if it exists, or create a new one and return that
+            return 0;
+        }
+
+        private Guid GetOrCreateLocalCompany(RemoteCompanyDto remoteCompany)
+        {
+            // Either return a company ID if it exists, or create a new one and return that
+            return Guid.NewGuid();
+        }
         
         // Called every N minutes
         private void Run()
