@@ -1,12 +1,11 @@
 using System.Collections.Generic;
 using System.Net.Http;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
+using TwoWaySync.Interfaces;
 using TwoWaySync.Models.Remote;
 
 namespace TwoWaySync.Services
 {
-    public class RemoteApiClient
+    public class RemoteApiClient : IRemoteApiClient
     {
         
         private readonly HttpClient _httpClient;
@@ -16,11 +15,44 @@ namespace TwoWaySync.Services
             _httpClient = httpClient;
         }
         
-        // GET /tasks/?last_modified_from=N&offset=N&page_size=N
-        public async Task<string> GetTasks(int lastModifiedFrom, int offset = 0, int pageSize = 100)
+        public RemoteTaskDto GetTasks(int id)
         {
-            await _httpClient.GetAsync("tasks/");
-            return "success, hopefully";
+            throw new System.NotImplementedException();
+        }
+
+        public void UpdateTask(int id)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public RemoteTaskDto CreateTask(RemoteTaskDto task)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public List<RemoteCompanyDto> GetCompanies(int lastModifiedFrom, int offset, int pageSize, string name)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public RemoteCompanyDto GetCompanies(int id)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void UpdateCompany(int id)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public RemoteCompanyDto CreateCompany(RemoteCompanyDto company)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        List<RemoteTaskDto> IRemoteApiClient.GetTasks(int lastModifiedFrom, int offset, int pageSize)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }
