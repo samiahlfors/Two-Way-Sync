@@ -24,5 +24,16 @@ namespace TwoWaySync.Services
                 return conn.QueryFirstOrDefault<EntityMapping>(sql, new {entityType, localId});
             }
         }
+        
+        public EntityMapping GetEntityByRemoteId(string entityType, int remoteId)
+        {
+            using (var conn = new NpgsqlConnection(_connectionString))
+            {
+                var sql = @"select entity_type as EntityType,
+                            local_id as LocalId
+                            from entity_mapping where entity_type = @entityType and remote_id = @remoteId";
+                return conn.QueryFirstOrDefault<EntityMapping>(sql, new {entityType, remoteId});
+            }
+        }
     }
 }
