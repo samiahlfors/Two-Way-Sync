@@ -36,5 +36,9 @@ namespace TwoWaySync.Services
                 return conn.QueryFirstOrDefault<EntityMapping>(sql, new {entityType, remoteId});
             }
         }
+
+        public void SaveMapping() { }
+        public DateTime GetSyncStamp(string entityType) => DateTime.Now;
+        public void SaveSyncStamp(string entityType, DateTime syncStamp) { }
     }
 }
