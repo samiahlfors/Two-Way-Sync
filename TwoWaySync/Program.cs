@@ -13,7 +13,7 @@ namespace TwoWaySync
             
             try
             {
-                var tasks = apiClient.GetTasks();
+                var tasks = apiClient.GetTasks(lastModifiedFrom: 0, offset: 0);
                 Console.WriteLine(tasks.Result);
             }
             catch (Exception ex)

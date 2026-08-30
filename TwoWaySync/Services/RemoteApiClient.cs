@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using TwoWaySync.Models.Remote;
 
 namespace TwoWaySync.Services
 {
@@ -14,7 +16,8 @@ namespace TwoWaySync.Services
             _httpClient = httpClient;
         }
         
-        public async Task<string> GetTasks()
+        // GET /tasks/?last_modified_from=N&offset=N&page_size=N
+        public async Task<string> GetTasks(int lastModifiedFrom, int offset = 0, int pageSize = 100)
         {
             await _httpClient.GetAsync("tasks/");
             return "success, hopefully";
