@@ -1,4 +1,5 @@
 using System;
+using System.Net.Http;
 using TwoWaySync.Services;
 
 namespace TwoWaySync
@@ -7,9 +8,18 @@ namespace TwoWaySync
     {
         public static void Main(string[] args)
         {
-            var repo = new MappingRepository("redacted and private");
-            var mapping = repo.GetEntityByLocalId("Task", new Guid("4d9d892d-ae4a-4800-b08e-263328169e0a"));
-            Console.WriteLine($"Fetched LocalId: {mapping?.LocalId}");
+            var httpClient = new HttpClient { BaseAddress = new Uri("http://localhost:5000") };
+            var apiClient = new RemoteApiClient(httpClient);
+            
+            try
+            {
+                var tasks = apiClient.GetTasks();
+                Console.WriteLine(tasks.Result);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+            }
         }
     }
 }
