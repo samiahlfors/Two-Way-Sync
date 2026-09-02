@@ -45,7 +45,7 @@
         </Reference>
         <Reference Include="mscorlib" />
         <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-          <HintPath>..\packages\Newtonsoft.Json.13.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
+          <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
         </Reference>
         <Reference Include="Npgsql, Version=6.0.11.0, Culture=neutral, PublicKeyToken=5d8b90d52f46fda7, processorArchitecture=MSIL">
           <HintPath>..\packages\Npgsql.6.0.11\lib\netstandard2.0\Npgsql.dll</HintPath>
@@ -58,7 +58,9 @@
           <HintPath>..\packages\System.Collections.Immutable.6.0.0\lib\net461\System.Collections.Immutable.dll</HintPath>
         </Reference>
         <Reference Include="System.ComponentModel.Composition" />
-        <Reference Include="System.Core"/>
+        <Reference Include="System.Core, Version=3.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+          <HintPath>..\packages\System.Core.3.5.21022.801\lib\net20\System.Core.dll</HintPath>
+        </Reference>
         <Reference Include="System.Data"/>
         <Reference Include="System.Diagnostics.DiagnosticSource, Version=6.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
           <HintPath>..\packages\System.Diagnostics.DiagnosticSource.6.0.0\lib\net461\System.Diagnostics.DiagnosticSource.dll</HintPath>

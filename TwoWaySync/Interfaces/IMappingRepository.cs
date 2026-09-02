@@ -13,7 +13,7 @@ namespace TwoWaySync.Interfaces
         EntityMapping GetEntityByRemoteId(string entityType, int remoteId);
         
         // This is to save and keep track of mappings
-        void SaveMapping();
+        void SaveMapping(string entityType, Guid localId, int remoteId);
         
         // Sync stamps are used to keep track of specific synchronisations
         // I.e. local tasks or remote companies

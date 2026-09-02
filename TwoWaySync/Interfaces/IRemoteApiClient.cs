@@ -11,7 +11,7 @@ namespace TwoWaySync.Interfaces
         // GET /tasks/{Id}
         RemoteTaskDto GetTask(int id);
         // PATCH /tasks/{Id}
-        void UpdateTask(int id); // TODO: Also pass in some data here
+        void UpdateTask(int id, object task);
         // POST /tasks/
         RemoteTaskDto CreateTask(RemoteTaskDto task);
         
@@ -20,7 +20,7 @@ namespace TwoWaySync.Interfaces
         // GET /companies/{Id}
         RemoteCompanyDto GetCompany(int id);
         // PATCH /companies/{Id}
-        void UpdateCompany(int id); // TODO: Also pass in some data here
+        void UpdateCompany(int id, object company);
         // POST /companies/
         RemoteCompanyDto CreateCompany(RemoteCompanyDto company);
     }
