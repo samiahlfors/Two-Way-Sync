@@ -118,9 +118,23 @@ namespace TwoWaySync.Services
         private void SyncCompaniesRemoteToLocal()
         {
             // Get last sync
-            // Get and loop through remote companies
-            // If local name does not match with remote name, update local company
-            // TODO: Save sync stamp here, I think..?
+            var lastSync = _repository.GetSyncStamp("last_sync_remote_company");
+            
+            // Get remote companies that have been modified after last sync
+            var companies = _apiClient.GetCompanies(TimeZoneHelper.ConvertDateTimeToUnix(lastSync));
+            foreach (var company in companies)
+            {
+                // Find correct mapping to match local company with the remote one
+                var entityMapping = _repository.GetEntityByRemoteId("Company", company.Id);
+                if (entityMapping == null) continue; // Nothing to sync
+                
+                // If the local name doesn't match with the remote one, update company
+                var localCompany = _localApi.GetCompanyById(entityMapping.LocalId);
+                if (localCompany.Name != company.Name)
+                {
+                    // Update company
+                }
+            }
         }
         
         // Get or create new company

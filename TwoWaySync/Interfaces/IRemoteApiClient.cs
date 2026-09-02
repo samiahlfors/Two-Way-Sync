@@ -16,7 +16,7 @@ namespace TwoWaySync.Interfaces
         RemoteTaskDto CreateTask(RemoteTaskDto task);
         
         // GET /companies/?last_modified_from=N&offset=N&page_size=N&name=S
-        List<RemoteCompanyDto> GetCompanies(long lastModifiedFrom, int offset, int pageSize, string name);
+        List<RemoteCompanyDto> GetCompanies(long lastModifiedFrom, int offset = 0, int pageSize = 0, string name = null);
         // GET /companies/{Id}
         RemoteCompanyDto GetCompany(int id);
         // PATCH /companies/{Id}
