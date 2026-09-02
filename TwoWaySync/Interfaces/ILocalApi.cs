@@ -6,14 +6,14 @@ namespace TwoWaySync.Interfaces
 {
     public interface ILocalApi
     {
-        Company GetCompanyByName(string companyName);
-        Company GetCompanyById(Guid companyId);
-        Company CreateCompany(string companyName);
-        List<Company> GetCompanies(DateTime changedFromStart, DateTime changedFromEnd);
+        LocalCompany GetCompanyByName(string companyName);
+        LocalCompany GetCompanyById(Guid companyId);
+        LocalCompany CreateCompany(string companyName);
+        List<LocalCompany> GetCompanies(DateTime changedFromStart, DateTime changedFromEnd);
 
-        Task GetTaskById(Guid taskId);
-        Task CreateOrUpdateTask(Task task);
-        List<Task> GetTasks(DateTime changedFromStart, DateTime changedFromEnd);
+        LocalTask GetTaskById(Guid taskId);
+        LocalTask CreateOrUpdateTask(LocalTask task);
+        List<LocalTask> GetTasks(DateTime changedFromStart, DateTime changedFromEnd);
     }
 }
 
