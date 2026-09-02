@@ -2,7 +2,7 @@ using System;
 
 namespace TwoWaySync.Models.Internal
 {
-    public class Company
+    public class LocalCompany
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
