@@ -77,6 +77,7 @@ namespace TwoWaySync.Services
                         localTask.CompanyId = localCompanyId;
                         _localApi.CreateOrUpdateTask(localTask);
                         
+                        // Remote task
                         _apiClient.UpdateTask(entityMapping.RemoteId, new
                         {
                             body = localTask.Contents,
