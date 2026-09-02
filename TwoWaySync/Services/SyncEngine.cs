@@ -62,31 +62,53 @@ namespace TwoWaySync.Services
             var lastSync = _repository.GetSyncStamp("last_sync_local_task");
             var lastSyncSwe = TimeZoneHelper.ConvertToUtc(lastSync);
             
-            // Get local tasks updated after said sync date
-            var tasks = _localApi.GetTasks(lastSyncSwe, DateTime.Now);
+            // Get local tasks updated after last sync date
+            var localTasks = _localApi.GetTasks(lastSyncSwe, DateTime.Now);
             
             // Loop through all tasks
-            foreach (var task in tasks)
+            foreach (var localTask in localTasks)
             {
-                // Get the local company
-                var localCompany = _localApi.GetCompanyById(task.CompanyId);
+                // Get mapping
+                var entityMapping = _repository.GetEntityByLocalId("Task", localTask.Id);
                 
-                // Get (or create) the corresponding remote company
-                var remoteCompany = GetOrCreateRemoteCompany(localCompany.Id);
+                // Get (or create) remote company
+                var remoteCompanyId = GetOrCreateRemoteCompany(localTask.CompanyId);
                 
-                // Get remote task (ID)
-                var remoteTaskId = _repository.GetEntityByLocalId("Task", task.Id);
-                
-                // If task found, update task
-                // Else, create a new one
+                // If the entity mapping does not exist, we have not yet created it on the remote server
+                if (entityMapping == null)
+                {
+                    // Create remote task
+                    // Local task time zone is UTC, convert to Swedish time 
+                    var remoteTask = _apiClient.CreateTask(new RemoteTaskDto
+                    {
+                        Subject = localTask.Contents,
+                        Deadline = TimeZoneHelper.ConvertToSwedishTime(localTask.Deadline),
+                        Finished = localTask.Completed,
+                        RelatedCompanyId = remoteCompanyId
+                    });
+                    
+                    // Save mapping
+                    _repository.SaveMapping("Task", localTask.Id, remoteTask.Id);
+                }
+                else
+                {
+                    // The Task has been updated locally and needs to be updated on the remote server
+                    _apiClient.UpdateTask(entityMapping.RemoteId, new
+                    {
+                        subject = localTask.Contents,
+                        deadline = TimeZoneHelper.ConvertToSwedishTime(localTask.Deadline),
+                        finished = localTask.Completed,
+                        related_company_id = remoteCompanyId
+                    });
+                }
             }
             
             // Save current time as "last_sync_local_task"
             // This should save the last processed task date
             // Only save if any changes were made
-            if (tasks.Count > 0)
+            if (localTasks.Count > 0)
             {
-                _repository.SaveSyncStamp("last_sync_local_task", tasks.Max(task => task.ChangedDate));   
+                _repository.SaveSyncStamp("last_sync_local_task", localTasks.Max(task => task.ChangedDate));   
             }
         }
         
@@ -132,7 +154,7 @@ namespace TwoWaySync.Services
                 var localCompany = _localApi.GetCompanyById(entityMapping.LocalId);
                 if (localCompany.Name != remoteCompany.Name)
                 {
-                    // Update company
+                    // TODO: Update company
                 }
             }
         }
