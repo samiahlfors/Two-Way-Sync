@@ -21,5 +21,6 @@ namespace TwoWaySync.Services
 
         public static DateTime ConvertToUtc(DateTime dateTime) => TimeZoneInfo.ConvertTimeToUtc(DateTime.SpecifyKind(dateTime, DateTimeKind.Unspecified), SweTimeZone);
         public static DateTime ConvertToSwedishTime(DateTime dateTime) => TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(dateTime, DateTimeKind.Utc), SweTimeZone);
+        public static long ConvertDateTimeToUnix(DateTime dateTime) => ((DateTimeOffset)dateTime).ToUnixTimeSeconds();
     }
 }

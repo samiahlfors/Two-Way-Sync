@@ -29,7 +29,7 @@ namespace TwoWaySync.Services
             var lastSyncUtc = TimeZoneHelper.ConvertToUtc(lastSync);
             
             // Get remote tasks updated after said sync date
-            var tasks = _apiClient.GetTasks(lastSyncUtc, 0, TasksPerRun);
+            var tasks = _apiClient.GetTasks(TimeZoneHelper.ConvertDateTimeToUnix(lastSyncUtc), 0, TasksPerRun);
             
             // Loop through all tasks
             foreach (var task in tasks)
@@ -73,7 +73,7 @@ namespace TwoWaySync.Services
                 var localCompany = _localApi.GetCompanyById(task.CompanyId);
                 
                 // Get (or create) the corresponding remote company
-                var remoteCompany = GetOrCreateRemoteCompany(localCompany);
+                var remoteCompany = GetOrCreateRemoteCompany(localCompany.Id);
                 
                 // Get remote task (ID)
                 var remoteTaskId = _repository.GetEntityByLocalId("Task", task.Id);
@@ -110,10 +110,29 @@ namespace TwoWaySync.Services
         }
         
         // Get or create new company
-        private int GetOrCreateRemoteCompany(Company company)
+        private int GetOrCreateRemoteCompany(Guid id)
         {
-            // Either return a company ID if it exists, or create a new one and return that
-            return 0;
+            // Get the entity mapping, and if it exists, just return the ID
+            var entityMapping = _repository.GetEntityByLocalId("Company", id);
+            if (entityMapping != null) return entityMapping.RemoteId;
+
+            // Get local company if it doesn't exist remotely
+            var localCompany = _localApi.GetCompanyById(id);
+            
+            // Make sure it exists remotely
+            var remoteCompany = _apiClient.GetCompanies(0, 0, 1, localCompany.Name).FirstOrDefault();
+            
+            // If it doesn't, create it on the remote server
+            if (remoteCompany == null)
+            {
+                remoteCompany = _apiClient.CreateCompany(new RemoteCompanyDto { Name = localCompany.Name });
+            }
+            
+            // Save the mapping
+            _repository.SaveMapping("Company", id, remoteCompany.Id);
+            
+            // Return the ID
+            return remoteCompany.Id;
         }
 
         private Guid GetOrCreateLocalCompany(int id)
@@ -135,15 +154,14 @@ namespace TwoWaySync.Services
             }
             
             // Save the mapping
-            _repository.SaveMapping("Company", localCompany.Id, remoteCompany.Id);
+            _repository.SaveMapping("Company", localCompany.Id, id);
             
             // Finally, return the ID
             return localCompany.Id;
         }
         
         // Called every N minutes
-        // TODO: Check if this should be renamed to Execute or similar
-        public void Run()
+        public void Execute()
         {
             // Run local company name syncing first
             SyncCompaniesLocalToRemote();
