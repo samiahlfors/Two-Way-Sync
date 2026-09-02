@@ -17,7 +17,7 @@ namespace TwoWaySync
             
             // Run Sync Engine
             var syncEngine = new SyncEngine(mappingRepository, remoteApiClient, localApi);
-            syncEngine.Run();
+            syncEngine.Execute();
         }
     }
 }
