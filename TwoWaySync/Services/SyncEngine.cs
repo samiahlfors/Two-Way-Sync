@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using TwoWaySync.Interfaces;
-using TwoWaySync.Models.Internal;
 using TwoWaySync.Models.Remote;
 
 namespace TwoWaySync.Services
@@ -94,11 +93,26 @@ namespace TwoWaySync.Services
         // Companies
         private void SyncCompaniesLocalToRemote()
         {
-            // TODO: Make sure this gets executed first, since "Membrain is the master for any given property"
             // Get last sync
+            var lastSync = _repository.GetSyncStamp("last_sync_local_company");
+            
             // Get and loop through local companies
-            // If remote name does not match with local name, update company remotely
-            // TODO: Save sync stamp here, I think..?
+            var companies = _localApi.GetCompanies(lastSync, DateTime.UtcNow);
+            foreach (var company in companies)
+            {
+                // Find correct mapping to match remote company with local
+                var entityMapping = _repository.GetEntityByLocalId("Company", company.Id);
+                if (entityMapping == null) continue; // Meaning, nothing to sync
+                
+                // If remote name does not match with local name, update company remotely
+                var remoteCompany = _apiClient.GetCompany(entityMapping.RemoteId);
+                if (company.Name != remoteCompany.Name)
+                {
+                    _apiClient.UpdateCompany(entityMapping.RemoteId, new { name = company.Name });
+                }
+            }
+
+            _repository.SaveSyncStamp("last_sync_local_company", DateTime.UtcNow);
         }
 
         private void SyncCompaniesRemoteToLocal()
