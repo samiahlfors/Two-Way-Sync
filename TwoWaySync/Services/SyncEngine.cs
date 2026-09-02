@@ -97,18 +97,18 @@ namespace TwoWaySync.Services
             var lastSync = _repository.GetSyncStamp("last_sync_local_company");
             
             // Get and loop through local companies
-            var companies = _localApi.GetCompanies(lastSync, DateTime.UtcNow);
-            foreach (var company in companies)
+            var localCompanies = _localApi.GetCompanies(lastSync, DateTime.UtcNow);
+            foreach (var localCompany in localCompanies)
             {
                 // Find correct mapping to match remote company with local
-                var entityMapping = _repository.GetEntityByLocalId("Company", company.Id);
+                var entityMapping = _repository.GetEntityByLocalId("Company", localCompany.Id);
                 if (entityMapping == null) continue; // Meaning, nothing to sync
                 
                 // If remote name does not match with local name, update company remotely
                 var remoteCompany = _apiClient.GetCompany(entityMapping.RemoteId);
-                if (company.Name != remoteCompany.Name)
+                if (localCompany.Name != remoteCompany.Name)
                 {
-                    _apiClient.UpdateCompany(entityMapping.RemoteId, new { name = company.Name });
+                    _apiClient.UpdateCompany(entityMapping.RemoteId, new { name = localCompany.Name });
                 }
             }
 
@@ -121,16 +121,16 @@ namespace TwoWaySync.Services
             var lastSync = _repository.GetSyncStamp("last_sync_remote_company");
             
             // Get remote companies that have been modified after last sync
-            var companies = _apiClient.GetCompanies(TimeZoneHelper.ConvertDateTimeToUnix(lastSync));
-            foreach (var company in companies)
+            var remoteCompanies = _apiClient.GetCompanies(TimeZoneHelper.ConvertDateTimeToUnix(lastSync));
+            foreach (var remoteCompany in remoteCompanies)
             {
                 // Find correct mapping to match local company with the remote one
-                var entityMapping = _repository.GetEntityByRemoteId("Company", company.Id);
+                var entityMapping = _repository.GetEntityByRemoteId("Company", remoteCompany.Id);
                 if (entityMapping == null) continue; // Nothing to sync
                 
                 // If the local name doesn't match with the remote one, update company
                 var localCompany = _localApi.GetCompanyById(entityMapping.LocalId);
-                if (localCompany.Name != company.Name)
+                if (localCompany.Name != remoteCompany.Name)
                 {
                     // Update company
                 }
