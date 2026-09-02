@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using TwoWaySync.Interfaces;
+using TwoWaySync.Models.Internal;
 using TwoWaySync.Models.Remote;
 
 namespace TwoWaySync.Services
@@ -27,31 +28,81 @@ namespace TwoWaySync.Services
             var lastSync = _repository.GetSyncStamp("last_sync_remote_task");
             var lastSyncUtc = TimeZoneHelper.ConvertToUtc(lastSync);
             
-            // Get remote tasks updated after said sync date
-            var tasks = _apiClient.GetTasks(TimeZoneHelper.ConvertDateTimeToUnix(lastSyncUtc), 0, TasksPerRun);
+            // Get remote tasks updated after last sync date
+            var remoteTasks = _apiClient.GetTasks(TimeZoneHelper.ConvertDateTimeToUnix(lastSyncUtc), 0, TasksPerRun);
             
             // Loop through all tasks
-            foreach (var task in tasks)
+            foreach (var remoteTask in remoteTasks)
             {
-                // Get the remote company
-                var remoteCompany = _apiClient.GetCompany(task.RelatedCompanyId);
+                // Get mapping
+                var entityMapping = _repository.GetEntityByRemoteId("Task", remoteTask.Id);
                 
-                // Get (or create) the corresponding local company
-                var localCompany = GetOrCreateLocalCompany(remoteCompany.Id);
+                // Get (or create) local company
+                var localCompanyId = GetOrCreateLocalCompany(remoteTask.RelatedCompanyId);
                 
-                // Get local task (ID)
-                var localTaskId = _repository.GetEntityByRemoteId("Task", task.Id).LocalId;
-                
-                // If task found, update task
-                // Else, create a new one
+                // If the mapping returns null, it's new and we can create it locally
+                if (entityMapping == null)
+                {
+                    var localTask = _localApi.CreateOrUpdateTask(new LocalTask
+                    {
+                        Id = Guid.NewGuid(),
+                        Contents = remoteTask.Body,
+                        Deadline = TimeZoneHelper.ConvertToUtc(remoteTask.Deadline),
+                        Completed = remoteTask.Finished,
+                        CompletedDate = DateTime.UtcNow, // Remote task does not have a matching field
+                        CompanyId = localCompanyId,
+                        ChangedDate = DateTime.UtcNow
+                    });
+                    
+                    // Save mapping
+                    _repository.SaveMapping("Task", localTask.Id, remoteTask.Id);
+                }
+                else
+                {
+                    // The Task is known and has been changed on the remote side
+                    // Since the task has the potential to be changed on both sides,
+                    // we need to check if there are any local changes here as well
+                    
+                    // Get the local task
+                    var localTask = _localApi.GetTaskById(entityMapping.LocalId);
+                    
+                    // Check if ChangedDate of localTask is "more recent" than the last sync date
+                    // That means that the local task has been updated, and this needs to reflect on the remote side
+                    if (localTask.ChangedDate > entityMapping.LastSynced)
+                    {
+                        // Update both sides, both local and remote
+                        
+                        // Local task
+                        localTask.Completed = remoteTask.Finished;
+                        localTask.CompanyId = localCompanyId;
+                        _localApi.CreateOrUpdateTask(localTask);
+                        
+                        _apiClient.UpdateTask(entityMapping.RemoteId, new
+                        {
+                            body = localTask.Contents,
+                            deadline = TimeZoneHelper.ConvertToSwedishTime(remoteTask.Deadline),
+                        });
+                    }
+                    else
+                    {
+                        // The local task was not updated, so we can sync the remote task and merge it with the local one
+                        localTask.Contents = remoteTask.Body;
+                        localTask.Deadline = TimeZoneHelper.ConvertToUtc(remoteTask.Deadline);
+                        localTask.Completed = remoteTask.Finished;
+                        localTask.CompanyId = localCompanyId;
+                        
+                        // Save the task
+                        _localApi.CreateOrUpdateTask(localTask);
+                    }
+                }
             }
             
             // Save current time as "last_sync_remote_task"
             // This should save the last processed task date
             // Only save if any changes were made
-            if (tasks.Count > 0)
+            if (remoteTasks.Count > 0)
             {
-                _repository.SaveSyncStamp("last_sync_remote_task", tasks.Max(task => task.LastModifiedDate));   
+                _repository.SaveSyncStamp("last_sync_remote_task", remoteTasks.Max(task => task.LastModifiedDate));   
             }
         }
 
@@ -81,7 +132,7 @@ namespace TwoWaySync.Services
                     // Local task time zone is UTC, convert to Swedish time 
                     var remoteTask = _apiClient.CreateTask(new RemoteTaskDto
                     {
-                        Subject = localTask.Contents,
+                        Body = localTask.Contents,
                         Deadline = TimeZoneHelper.ConvertToSwedishTime(localTask.Deadline),
                         Finished = localTask.Completed,
                         RelatedCompanyId = remoteCompanyId
@@ -94,8 +145,8 @@ namespace TwoWaySync.Services
                 {
                     // The Task has been updated locally and needs to be updated on the remote server
                     _apiClient.UpdateTask(entityMapping.RemoteId, new
-                    {
-                        subject = localTask.Contents,
+                    { 
+                        body = localTask.Contents,
                         deadline = TimeZoneHelper.ConvertToSwedishTime(localTask.Deadline),
                         finished = localTask.Completed,
                         related_company_id = remoteCompanyId
@@ -154,9 +205,12 @@ namespace TwoWaySync.Services
                 var localCompany = _localApi.GetCompanyById(entityMapping.LocalId);
                 if (localCompany.Name != remoteCompany.Name)
                 {
-                    // TODO: Update company
+                    // Local API does not have an update company method, create a new one
+                    _localApi.CreateCompany(remoteCompany.Name);
                 }
             }
+            
+            _repository.SaveSyncStamp("last_sync_remote_company", DateTime.UtcNow);
         }
         
         // Get or create new company

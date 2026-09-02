@@ -119,8 +119,8 @@
         <Compile Include="Interfaces\IMappingRepository.cs" />
         <Compile Include="Interfaces\IRemoteApiClient.cs" />
         <Compile Include="Models\EntityMapping.cs" />
-        <Compile Include="Models\Internal\Company.cs" />
-        <Compile Include="Models\Internal\Task.cs" />
+        <Compile Include="Models\Internal\LocalCompany.cs" />
+        <Compile Include="Models\Internal\LocalTask.cs" />
         <Compile Include="Models\Remote\RemoteCompanyDto.cs" />
         <Compile Include="Models\Remote\RemoteTaskDto.cs" />
         <Compile Include="Program.cs"/>
