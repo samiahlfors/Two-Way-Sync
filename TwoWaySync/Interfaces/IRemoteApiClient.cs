@@ -7,7 +7,7 @@ namespace TwoWaySync.Interfaces
     public interface IRemoteApiClient
     {
         // GET /tasks/?last_modified_from=N&offset=N&page_size=N
-        List<RemoteTaskDto> GetTasks(DateTime lastModifiedFrom, int offset, int pageSize);
+        List<RemoteTaskDto> GetTasks(long lastModifiedFrom, int offset, int pageSize);
         // GET /tasks/{Id}
         RemoteTaskDto GetTask(int id);
         // PATCH /tasks/{Id}
@@ -16,7 +16,7 @@ namespace TwoWaySync.Interfaces
         RemoteTaskDto CreateTask(RemoteTaskDto task);
         
         // GET /companies/?last_modified_from=N&offset=N&page_size=N&name=S
-        List<RemoteCompanyDto> GetCompanies(DateTime lastModifiedFrom, int offset, int pageSize, string name);
+        List<RemoteCompanyDto> GetCompanies(long lastModifiedFrom, int offset, int pageSize, string name);
         // GET /companies/{Id}
         RemoteCompanyDto GetCompany(int id);
         // PATCH /companies/{Id}
